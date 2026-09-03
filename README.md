@@ -32,6 +32,7 @@ Demo login:
 - Хүсэлт хүлээн авах HR хаяг: `monosubmonos@gmail.com`
 - HR хүсэлт илгээхэд default mail application нээгдэж, илгээгчийн хаяг хүсэлтийн draft-д орно. Бодит `From` account-ийг тухайн mail application-д `ulziiuuree22@gmail.com` болгон тохируулна.
 - `Тодорхойлолт загвар.pdf` файлыг salary хэсгийн template татах үйлдэлд холбосон
+- `тодорхойлолт.docx` загварт тулгуурлан ажилтны мэдээллээр цалингийн тодорхойлолт PDF үүсгэж татна
 - Admin overview
 - Excel import entry point
 - Mongolian Monos HR AI chatbot demo
@@ -47,6 +48,7 @@ Demo login:
 - `styles.css` - responsive UI, brand styling
 - `app.js` - demo state, navigation, forms, chatbot logic
 - `jobs.js` - Zangia Monos Group open positions view
+- `salary-pdf.js` - employee data-filled salary certificate PDF generator
 - `Monos_HR_Web_Test_Data_100_Employees.xlsx` - supplied test data
 
 ## Дараагийн production implementation
