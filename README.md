@@ -49,6 +49,8 @@ Node.js суулгасны дараа Next.js, Prisma, SQLite/PostgreSQL, server
 session authentication, Zod validation, PDF generation, Excel importer,
 HRKnowledge importer болон Gemini/OpenAI provider abstraction-ийг backend
 холболттойгоор нэмнэ. Одоогийн хүсэлт илгээх ажиллагаа нь хэрэглэгчийн
-default mail application-ийг `mailto:` холбоосоор нээдэг; production-д SMTP
+Gmail compose цонх нээгдэж, `From` account `ulziiuuree22@gmail.com`, `To` account
+`monosubmonos@gmail.com` болон хүсэлтийн мэдээлэл автоматаар бөглөгдөнө. Gmail
+дээр `Send` дарж илгээнэ; production-д SMTP
 эсвэл transactional email service ашиглан автоматаар илгээх шаардлагатай.
 Chatbot нь UI/demo logic бөгөөд production AI API эсвэл database рүү холбогдоогүй.
