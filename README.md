@@ -1,10 +1,15 @@
 # Monos HR Employee Portal
 
-Browser-оор шууд нээгддэг demo хувилбар. Одоогийн орчинд Node.js/npm PATH-д байхгүй тул энэ хувилбар нь dependency-free HTML/CSS/JavaScript хэлбэрээр бэлтгэгдсэн.
+Streamlit дээр ажиллах demo хувилбар. `app.py` нь одоо байгаа HTML/CSS/JavaScript порталыг Streamlit component дотор харуулна.
 
 ## Ажиллуулах
 
-`index.html` файлыг browser-оор нээнэ.
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Хэрэв dependency суулгахгүйгээр шалгах бол `index.html` файлыг browser-оор шууд нээж болно.
 
 Demo login:
 
@@ -31,6 +36,9 @@ Demo login:
 
 ## Файлууд
 
+- `app.py` - Streamlit entrypoint
+- `requirements.txt` - Streamlit dependency
+- `Procfile` - deployment command
 - `index.html` - application shell
 - `styles.css` - responsive UI, brand styling
 - `app.js` - demo state, navigation, forms, chatbot logic
