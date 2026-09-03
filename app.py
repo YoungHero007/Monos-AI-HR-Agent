@@ -14,7 +14,7 @@ ROOT = Path(__file__).parent
 def load_sheet(sheet_name):
     workbook = ROOT / "Monos_HR_Web_Test_Data_100_Employees.xlsx"
     with zipfile.ZipFile(workbook) as archive:
-        sheet_number = {"employees": 2, "requests": 3, "certificates": 9}[sheet_name]
+        sheet_number = {"employees": 2, "requests": 3, "orders": 5, "certificates": 9}[sheet_name]
         xml = ET.fromstring(archive.read(f"xl/worksheets/sheet{sheet_number}.xml"))
     namespace = {"main": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
     rows = []
@@ -56,6 +56,7 @@ html_path = ROOT / "index.html"
 html = html_path.read_text(encoding="utf-8")
 employee_data = json.dumps(load_employees(), ensure_ascii=False)
 request_data = json.dumps(load_sheet("requests"), ensure_ascii=False)
+order_data = json.dumps(load_sheet("orders"), ensure_ascii=False)
 certificate_data = json.dumps(load_sheet("certificates"), ensure_ascii=False)
 css = (ROOT / "styles.css").read_text(encoding="utf-8")
 logo_css = (ROOT / "pharmacy-logo.css").read_text(encoding="utf-8")
@@ -70,7 +71,7 @@ portal_submissions = (ROOT / "portal-submissions.js").read_text(encoding="utf-8"
 template = base64.b64encode((ROOT / "Тодорхойлолт загвар.pdf").read_bytes()).decode("ascii")
 html = html.replace(
     '<script src="app.js"></script>',
-    f"<script>window.HR_EMPLOYEES={employee_data};window.HR_REQUESTS={request_data};window.HR_CERTIFICATES={certificate_data};</script><script src=\"app.js\"></script>",
+    f"<script>window.HR_EMPLOYEES={employee_data};window.HR_REQUESTS={request_data};window.HR_ORDERS={order_data};window.HR_CERTIFICATES={certificate_data};</script><script src=\"app.js\"></script>",
 ).replace(
     '<link rel="stylesheet" href="styles.css" />',
     f"<style>{css}{logo_css}</style>",

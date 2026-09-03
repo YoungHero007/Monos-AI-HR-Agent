@@ -19,6 +19,7 @@ Demo login:
 ## Одоогийн demo боломжууд
 
 - HR Admin dashboard-оос portal хүсэлтүүдийг Excel файлаар татна
+- HR Admin dashboard дээр цалин, амралт/чөлөө, тушаалын огноо болон дугаарын бүртгэл харагдана
 ## Файлууд
 
 - `app.py` - Streamlit entrypoint
