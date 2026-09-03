@@ -17,6 +17,7 @@ st.set_page_config(
 html_path = ROOT / "index.html"
 html = html_path.read_text(encoding="utf-8")
 css = (ROOT / "styles.css").read_text(encoding="utf-8")
+logo_css = (ROOT / "pharmacy-logo.css").read_text(encoding="utf-8")
 javascript = (ROOT / "app.js").read_text(encoding="utf-8")
 salary_pdf = (ROOT / "salary-pdf.js").read_text(encoding="utf-8")
 mail_config = (ROOT / "mail-config.js").read_text(encoding="utf-8")
@@ -25,7 +26,7 @@ portal_links = (ROOT / "portal-links.js").read_text(encoding="utf-8")
 template = base64.b64encode((ROOT / "Тодорхойлолт загвар.pdf").read_bytes()).decode("ascii")
 html = html.replace(
     '<link rel="stylesheet" href="styles.css" />',
-    f"<style>{css}</style>",
+    f"<style>{css}{logo_css}</style>",
 ).replace(
     '<script src="app.js"></script>',
     f"<script>{javascript}</script>",
