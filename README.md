@@ -30,6 +30,7 @@ Demo login:
 - `app.js` - demo state, navigation, forms, chatbot logic
 - `jobs.js` - Zangia Monos Group open positions view
 - `salary-pdf.js` - employee data-filled salary certificate PDF generator
+- `salary-enhancements.js` - purpose, automatic number/date, and Executive Director eSign demo PDF flow
 - `portal-links.js` - Legalinfo chatbot link and E-Mongolia social insurance action
 - `pharmacy-logo.css` - Монос Эмийн сан brand styling
 - `auth.js` - Excel employee-based login and profile mapping

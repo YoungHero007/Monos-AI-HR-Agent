@@ -64,6 +64,7 @@ javascript = (ROOT / "app.js").read_text(encoding="utf-8")
 auth = (ROOT / "auth.js").read_text(encoding="utf-8")
 admin = (ROOT / "admin.js").read_text(encoding="utf-8")
 salary_pdf = (ROOT / "salary-pdf.js").read_text(encoding="utf-8")
+salary_enhancements = (ROOT / "salary-enhancements.js").read_text(encoding="utf-8")
 mail_config = (ROOT / "mail-config.js").read_text(encoding="utf-8")
 jobs = (ROOT / "jobs.js").read_text(encoding="utf-8")
 portal_links = (ROOT / "portal-links.js").read_text(encoding="utf-8")
@@ -87,6 +88,9 @@ html = html.replace(
 ).replace(
     '<script src="salary-pdf.js"></script>',
     f"<script>{salary_pdf}</script>",
+).replace(
+    '<script src="salary-enhancements.js"></script>',
+    f"<script>{salary_enhancements}</script>",
 ).replace(
     '<script src="mail-config.js"></script>',
     f"<script>{mail_config}</script>",
