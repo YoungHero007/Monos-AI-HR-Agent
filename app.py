@@ -21,6 +21,7 @@ javascript = (ROOT / "app.js").read_text(encoding="utf-8")
 salary_pdf = (ROOT / "salary-pdf.js").read_text(encoding="utf-8")
 mail_config = (ROOT / "mail-config.js").read_text(encoding="utf-8")
 jobs = (ROOT / "jobs.js").read_text(encoding="utf-8")
+portal_links = (ROOT / "portal-links.js").read_text(encoding="utf-8")
 template = base64.b64encode((ROOT / "Тодорхойлолт загвар.pdf").read_bytes()).decode("ascii")
 html = html.replace(
     '<link rel="stylesheet" href="styles.css" />',
@@ -37,6 +38,9 @@ html = html.replace(
 ).replace(
     '<script src="jobs.js"></script>',
     f"<script>{jobs}</script>",
+).replace(
+    '<script src="portal-links.js"></script>',
+    f"<script>{portal_links}</script>",
 ).replace(
     "./Monos_Calingiin_Todorhoilolt_Template.docx",
     f"data:application/pdf;base64,{template}",

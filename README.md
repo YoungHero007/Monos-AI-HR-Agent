@@ -49,6 +49,7 @@ Demo login:
 - `app.js` - demo state, navigation, forms, chatbot logic
 - `jobs.js` - Zangia Monos Group open positions view
 - `salary-pdf.js` - employee data-filled salary certificate PDF generator
+- `portal-links.js` - Legalinfo chatbot link and E-Mongolia social insurance action
 - `Monos_HR_Web_Test_Data_100_Employees.xlsx` - supplied test data
 
 ## Дараагийн production implementation
