@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monos HR | Employee Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div id="loginView" class="login-shell">
+    <div class="login-art">
+      <div class="brand-mark"><span class="brand-dot"></span> monos <em>people</em></div>
+      <div class="art-copy"><p class="eyebrow">EMPLOYEE SELF-SERVICE</p><h1>Ажилдаа хэрэгтэй бүх зүйл нэг дор.</h1><p>Monos-ийн ажилтны өдөр тутмын HR үйлчилгээг хурдан, ойлгомжтой, аюулгүйгээр ашиглаарай.</p></div>
+      <div class="art-footer"><span>01</span><span class="line"></span><span>MONOS HR PORTAL</span></div>
+    </div>
+    <div class="login-panel"><div class="login-inner"><div class="mobile-brand"><div class="brand-mark"><span class="brand-dot"></span> monos <em>people</em></div></div><p class="eyebrow">ТАВТАЙ МОРИЛ</p><h2>Системд нэвтрэх</h2><p class="muted">Ажилтны мэдээллээ харахын тулд нэвтэрнэ үү.</p><form id="loginForm"><label>Employee ID<input id="employeeId" value="EMP001" autocomplete="username" required /></label><label>Password<div class="password-wrap"><input id="password" type="password" value="demo123" autocomplete="current-password" required /><button type="button" class="icon-button" id="togglePassword" aria-label="Нууц үг харах"><i data-lucide="eye"></i></button></div></label><div class="login-options"><label class="check"><input type="checkbox" checked /> Намайг сануулах</label><a href="#">Нууц үг мартсан?</a></div><button class="primary full" type="submit">Нэвтрэх <i data-lucide="arrow-right"></i></button></form><div class="demo-note"><i data-lucide="sparkles"></i><div><strong>Demo access</strong><span>EMP001 / demo123 &nbsp; · &nbsp; admin / admin123</span></div></div></div></div>
+  </div>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar"><div class="side-top"><div class="brand-mark"><span class="brand-dot"></span> monos <em>people</em></div><button class="close-sidebar icon-button" id="closeSidebar"><i data-lucide="x"></i></button></div><div class="workspace-label">WORKSPACE <span>DEMO</span></div><nav id="mainNav"><button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></button><button class="nav-item" data-view="salary"><i data-lucide="wallet-cards"></i><span>Цалин</span></button><button class="nav-item" data-view="leave"><i data-lucide="calendar-days"></i><span>Амралт, чөлөө</span><b>2</b></button><button class="nav-item" data-view="schedule"><i data-lucide="calendar-clock"></i><span>Ээлжийн хуваарь</span></button><button class="nav-item" data-view="orders"><i data-lucide="file-text"></i><span>Тушаал</span></button><button class="nav-item" data-view="social"><i data-lucide="landmark"></i><span>Нийгмийн даатгал</span></button><button class="nav-item" data-view="profile"><i data-lucide="contact"></i><span>Хувийн мэдээлэл</span></button><div class="nav-divider"></div><button class="nav-item" data-view="hr"><i data-lucide="message-square-more"></i><span>HR-д асуулт</span></button><button class="nav-item admin-nav" data-view="admin"><i data-lucide="shield-check"></i><span>Admin mode</span></button></nav><div class="sidebar-bottom"><div class="help-card"><i data-lucide="life-buoy"></i><strong>Тусламж хэрэгтэй юу?</strong><span>HR багтай холбогдох</span><button data-view="hr">Асуулт илгээх <i data-lucide="arrow-up-right"></i></button></div><button class="user-mini" id="logoutBtn"><span class="avatar">Б</span><span><strong>Батзориг Э.</strong><small>EMP001</small></span><i data-lucide="log-out"></i></button></div></aside>
+    <main class="main-content"><header class="topbar"><button class="menu-button icon-button" id="openSidebar"><i data-lucide="menu"></i></button><div class="breadcrumbs"><span>Monos HR</span><i data-lucide="chevron-right"></i><strong id="pageCrumb">Dashboard</strong></div><div class="top-actions"><button class="icon-button notification" aria-label="Мэдэгдэл"><i data-lucide="bell"></i><span></span></button><div class="top-user"><span class="avatar">Б</span><span><strong>Батзориг Э.</strong><small>EMP001</small></span><i data-lucide="chevron-down"></i></div></div></header><div id="pageContent"></div></main>
+  </div>
+
+  <button class="chat-fab" id="chatFab"><i data-lucide="message-circle"></i><span>Monos HR AI</span><b>AI</b></button>
+  <section class="chat-panel hidden" id="chatPanel"><header><div class="ai-avatar"><i data-lucide="sparkles"></i></div><div><strong>Monos HR AI</strong><span><i></i> Онлайн</span></div><button class="icon-button" id="closeChat"><i data-lucide="x"></i></button></header><div class="chat-messages" id="chatMessages"><div class="chat-date">ӨНӨӨДӨР</div><div class="message bot"><span>Сайн байна уу, Батзориг. Танд юугаар туслах вэ?</span><small>09:41</small></div><div class="suggestions"><button>Миний амралтын хэд хоног үлдсэн бэ?</button><button>Цалингийн тодорхойлолт яаж авах вэ?</button><button>НДШ мэдээлэл харах</button></div></div><form class="chat-input" id="chatForm"><input id="chatInput" placeholder="Асуултаа бичнэ үү..." autocomplete="off" /><button type="submit" aria-label="Илгээх"><i data-lucide="send"></i></button></form></section>
+  <script src="app.js"></script>
+</body>
+</html>
