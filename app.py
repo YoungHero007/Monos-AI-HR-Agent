@@ -529,6 +529,23 @@ def next_certificate_number(employee_id: str) -> str:
     return st.session_state.certificate_numbers[employee_id]
 
 
+def register_pdf_fonts() -> None:
+    font_candidates = [
+        (Path(r"C:\Windows\Fonts\arial.ttf"), Path(r"C:\Windows\Fonts\arialbd.ttf")),
+        (Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"), Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")),
+    ]
+    regular_font, bold_font = next(
+        ((regular, bold) for regular, bold in font_candidates if regular.exists() and bold.exists()),
+        (None, None),
+    )
+    if regular_font is None:
+        raise RuntimeError("Кирилл үсэг дэмждэг PDF фонт олдсонгүй.")
+    if "ArialUnicode" not in pdfmetrics.getRegisteredFontNames():
+        pdfmetrics.registerFont(TTFont("ArialUnicode", str(regular_font)))
+    if "ArialUnicode-Bold" not in pdfmetrics.getRegisteredFontNames():
+        pdfmetrics.registerFont(TTFont("ArialUnicode-Bold", str(bold_font)))
+
+
 def generate_work_contract_pdf(recipient: str = "", document_number: str = "", document_date=None) -> bytes:
     employee = get_employee()
     template_path = Path(__file__).with_name("Тодорхойлолт загвар.pdf")
@@ -541,8 +558,7 @@ def generate_work_contract_pdf(recipient: str = "", document_number: str = "", d
     if template_path.exists():
         overlay_buffer = BytesIO()
         overlay = canvas.Canvas(overlay_buffer, pagesize=A4)
-        pdfmetrics.registerFont(TTFont("ArialUnicode", r"C:\Windows\Fonts\arial.ttf"))
-        pdfmetrics.registerFont(TTFont("ArialUnicode-Bold", r"C:\Windows\Fonts\arialbd.ttf"))
+        register_pdf_fonts()
         overlay.setFillColorRGB(1, 1, 1)
         overlay.rect(92, 300, 410, 270, fill=1, stroke=0)
         overlay.setFillColorRGB(0, 0, 0)
@@ -601,8 +617,7 @@ def generate_work_contract_pdf(recipient: str = "", document_number: str = "", d
         topMargin=40,
         bottomMargin=40,
     )
-    pdfmetrics.registerFont(TTFont("ArialUnicode", r"C:\Windows\Fonts\arial.ttf"))
-    pdfmetrics.registerFont(TTFont("ArialUnicode-Bold", r"C:\Windows\Fonts\arialbd.ttf"))
+    register_pdf_fonts()
     addMapping("ArialUnicode", 0, 0, "ArialUnicode")
     addMapping("ArialUnicode", 1, 0, "ArialUnicode-Bold")
 
