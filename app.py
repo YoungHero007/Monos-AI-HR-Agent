@@ -27,33 +27,34 @@ st.set_page_config(page_title="MONOS HR Portal", page_icon="🧑‍💼", layout
 st.markdown(
     """
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
         :root {
-            --monos-bg: #f3efe9;
-            --monos-card: #fffdfb;
-            --monos-panel: #f8f5f2;
-            --monos-primary: #1f2f2f;
-            --monos-primary-soft: #2b4b46;
-            --monos-accent: #d8b35f;
-            --monos-accent-soft: #efe0b8;
-            --monos-text: #181818;
-            --monos-muted: #5b5b5b;
-            --monos-border: #e3ddd6;
+                --monos-bg: #f5f2ec;
+                --monos-card: #fffdfa;
+                --monos-panel: #f9f7f2;
+                --monos-primary: #173b35;
+                --monos-primary-soft: #2d6757;
+                --monos-accent: #c49a52;
+                --monos-accent-soft: #f1e4c9;
+                --monos-text: #202622;
+                --monos-muted: #6d766f;
+                --monos-border: #e4ded2;
+                --monos-shadow: 0 18px 45px rgba(35, 52, 43, 0.08);
         }
 
         html, body, [data-testid="stAppViewContainer"] {
-            background: var(--monos-bg);
+                background: radial-gradient(circle at 92% 0%, rgba(196,154,82,.11), transparent 28rem), var(--monos-bg);
             color: var(--monos-text);
-            font-family: 'Inter', sans-serif;
+                font-family: 'DM Sans', sans-serif;
         }
 
         .stApp {
-            background: var(--monos-bg);
+                background: radial-gradient(circle at 92% 0%, rgba(196,154,82,.11), transparent 28rem), var(--monos-bg);
         }
 
         [data-testid="stSidebar"] {
-            background: #f7f4f1;
+                background: #eeeae1;
             border-right: 1px solid var(--monos-border);
         }
 
@@ -62,7 +63,7 @@ st.markdown(
         }
 
         .block-container {
-            padding-top: 1.5rem;
+                padding-top: 2.2rem;
             padding-bottom: 3rem;
             max-width: 1280px;
         }
@@ -70,19 +71,19 @@ st.markdown(
         .stButton > button,
         .stDownloadButton > button,
         .stFormSubmitButton > button {
-            background: linear-gradient(180deg, #1d3b36 0%, #173230 100%);
+                background: var(--monos-primary);
             color: #fff;
             border: 0;
-            border-radius: 12px;
+                border-radius: 10px;
             padding: 0.65rem 1rem;
             font-weight: 600;
-            box-shadow: none;
+                box-shadow: 0 8px 18px rgba(23, 59, 53, 0.15);
         }
 
         .stButton > button:hover,
         .stDownloadButton > button:hover,
         .stFormSubmitButton > button:hover {
-            background: linear-gradient(180deg, #224a45 0%, #183832 100%);
+                background: var(--monos-primary-soft);
             color: #fff;
         }
 
@@ -91,18 +92,18 @@ st.markdown(
         .stSelectbox > div > div,
         .stDateInput > div > div,
         .stTextArea textarea {
-            background: var(--monos-card);
+                background: var(--monos-card);
             border: 1px solid var(--monos-border);
             border-radius: 12px;
             color: var(--monos-text);
         }
 
         .stMetric {
-            background: var(--monos-card);
+                background: var(--monos-card);
             border: 1px solid var(--monos-border);
             border-radius: 16px;
             padding: 1rem;
-            box-shadow: 0 2px 10px rgba(32, 35, 34, 0.03);
+                box-shadow: var(--monos-shadow);
         }
 
         .stMetric [data-testid="metric-container"] {
@@ -120,20 +121,47 @@ st.markdown(
 
         h1, h2, h3, h4 {
             color: var(--monos-primary);
-            letter-spacing: -0.02em;
+            font-family: 'Manrope', sans-serif;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+        }
+
+        [data-testid="stSidebar"] h1 {
+            font-size: 1.6rem;
+            letter-spacing: 0.02em;
+        }
+
+        label, [data-testid="stMetricLabel"] {
+            color: var(--monos-muted) !important;
+            font-weight: 600;
+        }
+
+        .stDownloadButton > button, .stLinkButton > a {
+            border: 1px solid var(--monos-accent);
+        }
+
+        .stLinkButton > a {
+            background: var(--monos-accent-soft);
+            color: var(--monos-primary);
+            border-radius: 10px;
+            font-weight: 700;
         }
 
         .monos-header {
-            background: rgba(255,255,255,0.45);
+                background: rgba(255,253,250,0.82);
             border: 1px solid var(--monos-border);
-            border-radius: 18px;
+                border-radius: 12px;
             padding: 0.9rem 1.1rem;
             margin-bottom: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            box-shadow: 0 6px 16px rgba(26, 37, 35, 0.04);
+                box-shadow: var(--monos-shadow);
         }
 
         .monos-brand {
@@ -146,8 +174,8 @@ st.markdown(
             width: 34px;
             height: 34px;
             border-radius: 10px;
-            background: linear-gradient(180deg, #1d2b2b 0%, #2d4a45 100%);
-            color: #f9e7b4;
+                background: var(--monos-primary);
+                color: #f5dfae;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -167,7 +195,7 @@ st.markdown(
             justify-content: center;
             padding: 0.65rem 1rem;
             border-radius: 999px;
-            background: rgba(23, 33, 33, 0.05);
+                background: var(--monos-accent-soft);
             border: 1px solid var(--monos-border);
             color: var(--monos-primary);
             text-decoration: none;
@@ -175,16 +203,16 @@ st.markdown(
         }
 
         .monos-link:hover {
-            background: rgba(23, 33, 33, 0.08);
+                background: #ead8b4;
             text-decoration: none;
         }
 
         .monos-card {
             background: var(--monos-card);
             border: 1px solid var(--monos-border);
-            border-radius: 18px;
+            border-radius: 12px;
             padding: 1.2rem;
-            box-shadow: 0 8px 18px rgba(15, 22, 21, 0.03);
+                box-shadow: var(--monos-shadow);
         }
 
         .monos-subtle {
