@@ -45,6 +45,7 @@ Demo login:
 - `index.html` - application shell
 - `styles.css` - responsive UI, brand styling
 - `app.js` - demo state, navigation, forms, chatbot logic
+- `jobs.js` - Zangia Monos Group open positions view
 - `Monos_HR_Web_Test_Data_100_Employees.xlsx` - supplied test data
 
 ## Дараагийн production implementation

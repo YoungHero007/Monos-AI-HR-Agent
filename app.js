@@ -1,7 +1,7 @@
 ﻿const employee={name:'Батзориг',fullName:'Батзориг Энхтөр',id:'EMP001',position:'Брэнд менежер',department:'Маркетинг',branch:'Төв оффис',salary:'2,500,000 ₮',leaveTotal:15,leaveUsed:8,leaveRemaining:7,email:'ulziiuuree22@gmail.com',phone:'+976 99112233'};
 const HR_EMAIL='monosubmonos@gmail.com';
 const LEGALINFO_URL='https://r.jina.ai/http://legalinfo.mn/mn';
-const navNames={dashboard:'Dashboard',salary:'Цалин',leave:'Амралт, чөлөө',schedule:'Ээлжийн хуваарь',orders:'Тушаал',social:'Нийгмийн даатгал',profile:'Хувийн мэдээлэл',hr:'HR-д асуулт',admin:'Admin mode'};
+const navNames={dashboard:'Dashboard',salary:'Цалин',leave:'Амралт, чөлөө',schedule:'Ээлжийн хуваарь',orders:'Тушаал',social:'Нийгмийн даатгал',profile:'Хувийн мэдээлэл',jobs:'Нээлттэй ажлын байр',hr:'HR-д асуулт',admin:'Admin mode'};
 const icon=(name)=>`<i data-lucide="${name}"></i>`;
 const page=(title,subtitle,body,action='')=>`<div class="page"><div class="page-heading"><div><p class="eyebrow">MONOS HR PORTAL</p><h1>${title}</h1><p>${subtitle}</p></div>${action}</div>${body}</div>`;
 function openMailTo(recipient,subject,body){const mailUrl=`mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;window.location.href=mailUrl;}
