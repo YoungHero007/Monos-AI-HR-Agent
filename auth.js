@@ -11,6 +11,12 @@ function applyEmployeeRecord(record){
   if(greeting)greeting.textContent=`Сайн байна уу, ${employee.name}. Танд юугаар туслах вэ?`;
 }
 
+function updatePortalIdentity(name,fullName,id){
+  document.querySelectorAll('.top-user strong,.user-mini strong').forEach(element=>element.textContent=fullName);
+  document.querySelectorAll('.top-user small,.user-mini small').forEach(element=>element.textContent=id);
+  document.querySelectorAll('.top-user .avatar,.user-mini .avatar').forEach(element=>element.textContent=name.charAt(0));
+}
+
 function refreshEmployeeNumbers(){
   const values=document.querySelectorAll('.stat-card .stat-value');
   if(values[0])values[0].textContent=employee.salary;
@@ -35,6 +41,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       employee.fullName='Хүний нөөцийн админ';
       employee.id='HR001';
       employee.position='HR Administrator';
+      updatePortalIdentity(employee.name,employee.fullName,employee.id);
       document.getElementById('loginView').classList.add('hidden');
       document.getElementById('appView').classList.remove('hidden');
       render('admin');
