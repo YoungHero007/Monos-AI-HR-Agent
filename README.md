@@ -6,6 +6,8 @@ Browser-оор шууд нээгддэг demo хувилбар. Одоогийн
 
 `index.html` файлыг browser-оор нээнэ.
 
+Streamlit portal-д бодит AI chatbot ашиглах бол `.env.local` файлд `OPENAI_API_KEY`-г тохируулах эсвэл deployment-ийн secret/environment variable-д сервер талд нэмнэ. API key frontend болон Git-д орохгүй.
+
 Demo login:
 
 - Employee: `EMP001` / `demo123`

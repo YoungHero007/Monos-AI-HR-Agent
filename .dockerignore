@@ -6,6 +6,7 @@ __pycache__/
 .gitignore
 .vscode/
 .env
+.env.local
 .DS_Store
 .mypy_cache/
 .pytest_cache/

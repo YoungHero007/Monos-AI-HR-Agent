@@ -9,6 +9,7 @@ from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 
+from dotenv import load_dotenv
 import requests
 import pandas as pd
 import streamlit as st
@@ -23,6 +24,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 st.set_page_config(page_title="MONOS HR Portal", page_icon="🧑‍💼", layout="wide")
+load_dotenv(Path(__file__).with_name(".env.local"))
 
 st.markdown(
     """
@@ -472,31 +474,71 @@ def load_admin_records() -> dict[str, pd.DataFrame]:
 
 
 def render_ai_chat() -> None:
-    st.subheader("Monos HR AI chatbot")
-    st.caption("HR-ийн түгээмэл мэдээллийг хурдан хайх эсвэл ChatGPT рүү үргэлжлүүлэн асууна уу.")
-    with st.container(border=True):
-        st.link_button("ChatGPT нээх", "https://chatgpt.com/", use_container_width=False)
-        if "ai_chat_messages" not in st.session_state:
-            st.session_state.ai_chat_messages = [
-                {"role": "assistant", "content": "Сайн байна уу. Цалин, амралт, НДШ эсвэл HR-ийн талаар асуугаарай."}
-            ]
+    employee = get_employee()
+    if "ai_chat_messages" not in st.session_state:
+        st.session_state.ai_chat_messages = []
+    with st.popover("🤖 Monos AI Assistant", use_container_width=False):
+        st.markdown("### 🤖 Monos AI Assistant")
+        st.caption("Хүний нөөцийн туслах")
+        st.link_button("ChatGPT нээх", "https://chatgpt.com/")
+        quick_questions = [
+            "Миний амралтын үлдэгдэл",
+            "Цалингийн тодорхойлолт авах",
+            "Чөлөө хэрхэн авах вэ?",
+            "HR журам",
+            "HR-тэй холбогдох",
+        ]
+        selected_question = st.selectbox("Quick questions", [""] + quick_questions, label_visibility="collapsed")
+        question = st.text_area("Асуулт", value=selected_question, placeholder="Монгол хэлээр асуултаа бичнэ үү...", height=80, label_visibility="collapsed")
+        send = st.button("Илгээх", type="primary", use_container_width=True)
         for message in st.session_state.ai_chat_messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
-        question = st.chat_input("HR асуултаа бичнэ үү...")
-        if question:
-            st.session_state.ai_chat_messages.append({"role": "user", "content": question})
-            lower_question = question.lower()
-            if "цалин" in lower_question:
-                answer = f"Таны сарын үндсэн цалин {get_employee()['salary']} байна."
-            elif "амралт" in lower_question or "чөлөө" in lower_question:
-                answer = f"Танд {get_employee()['leave_remaining']} хоногийн амралт үлдсэн байна."
-            elif "ндш" in lower_question or "нийгмийн" in lower_question:
-                answer = "Нийгмийн даатгалын мэдээллээ Нийгмийн даатгал хэсгээс шалгана уу."
-            else:
-                answer = "Энэ асуултад demo мэдээллээр хариулж чадсангүй. ChatGPT нээгээд үргэлжлүүлэн асуугаарай."
-            st.session_state.ai_chat_messages.append({"role": "assistant", "content": answer})
-            st.rerun()
+        if send and question.strip():
+            if not os.getenv("OPENAI_API_KEY"):
+                st.error("OPENAI_API_KEY тохируулагдаагүй байна. Админ .env.local эсвэл deployment secret-д нэмнэ үү.")
+                return
+            st.session_state.ai_chat_messages.append({"role": "user", "content": question.strip()})
+            with st.chat_message("assistant"):
+                with st.spinner("Хариулт бэлтгэж байна..."):
+                    response = st.write_stream(stream_openai_reply(st.session_state.ai_chat_messages, employee))
+            st.session_state.ai_chat_messages.append({"role": "assistant", "content": response})
+
+
+def stream_openai_reply(messages: list[dict], employee: dict):
+    system_prompt = (
+        "Та Monos HR Assistant. Монгол хэлээр эелдэг, товч, мэргэжлийн хариул. "
+        "Зөвхөн доорх login хийсэн ажилтны мэдээллийг ашигла. Мэдэхгүй мэдээллийг зохиож болохгүй. "
+        f"Одоогийн ажилтны мэдээлэл: {json.dumps(employee, ensure_ascii=False, default=str)}"
+    )
+    payload = {
+        "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+        "stream": True,
+        "temperature": 0.2,
+        "messages": [{"role": "system", "content": system_prompt}] + messages[-12:],
+    }
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}", "Content-Type": "application/json"},
+            json=payload,
+            stream=True,
+            timeout=60,
+        )
+        response.raise_for_status()
+        for line in response.iter_lines(decode_unicode=True):
+            if not line or not line.startswith("data:"):
+                continue
+            data = line[5:].strip()
+            if data == "[DONE]":
+                break
+            delta = json.loads(data).get("choices", [{}])[0].get("delta", {}).get("content")
+            if delta:
+                yield delta
+    except requests.RequestException as error:
+        yield f"OpenAI холболт амжилтгүй боллоо: {error}"
+    except (KeyError, json.JSONDecodeError):
+        yield "AI хариуг боловсруулах үед алдаа гарлаа. Дахин оролдоно уу."
 
 
 def dataframe_to_excel(dataframe: pd.DataFrame, filename: str) -> None:
