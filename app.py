@@ -1069,7 +1069,7 @@ else:
     if "current_page" not in st.session_state:
         st.session_state.current_page = "dashboard"
 
-    pages = ["admin"] if st.session_state.employee.get("is_admin") else list(NAV_ITEMS.keys())
+    pages = ["admin"] if st.session_state.employee.get("is_admin") else [page for page in NAV_ITEMS if page != "admin"]
     if st.session_state.current_page not in pages:
         st.session_state.current_page = pages[0]
     with st.sidebar:
