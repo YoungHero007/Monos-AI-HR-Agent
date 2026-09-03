@@ -2,12 +2,23 @@ function applyEmployeeRecord(record){
   const salary=record['Үндсэн цалин']||'0';
   const leaveTotal=Number(record['Жилийн амралтын хоног'])||0;
   const leaveRemaining=Number(record['Үлдсэн амралтын хоног'])||0;
-  Object.assign(employee,{name:record['Нэр']||employee.name,fullName:`${record['Овог']||''} ${record['Нэр']||''}`.trim(),id:record.employee_id,position:record['Албан тушаал']||'',department:record['Хэлтэс']||'',branch:record['Салбар']||'',salary:salary.includes('₮')?salary:`${salary} ₮`,leaveTotal,leaveUsed:Math.max(0,leaveTotal-leaveRemaining),leaveRemaining,email:record['Имэйл']||'',phone:record['Утас']||''});
+  const workedYears=Number(record['Ажилласан жил'])||0;
+  Object.assign(employee,{name:record['Нэр']||employee.name,fullName:`${record['Овог']||''} ${record['Нэр']||''}`.trim(),id:record.employee_id,position:record['Албан тушаал']||'',department:record['Хэлтэс']||'',branch:record['Салбар']||'',salary:salary.includes('₮')?salary:`${Number(salary).toLocaleString()} ₮`,leaveTotal,leaveUsed:Math.max(0,leaveTotal-leaveRemaining),leaveRemaining,workedYears,email:record['Имэйл']||'',phone:record['Утас']||''});
   document.querySelectorAll('.top-user strong,.user-mini strong').forEach(element=>element.textContent=employee.fullName);
   document.querySelectorAll('.top-user small,.user-mini small').forEach(element=>element.textContent=employee.id);
   document.querySelectorAll('.top-user .avatar,.user-mini .avatar').forEach(element=>element.textContent=employee.name.charAt(0));
   const greeting=document.querySelector('#chatMessages .message.bot span');
   if(greeting)greeting.textContent=`Сайн байна уу, ${employee.name}. Танд юугаар туслах вэ?`;
+}
+
+function refreshEmployeeNumbers(){
+  const values=document.querySelectorAll('.stat-card .stat-value');
+  if(values[0])values[0].textContent=employee.salary;
+  if(values[1])values[1].textContent=employee.leaveRemaining;
+  if(values[3])values[3].textContent=employee.workedYears;
+  const workedLabel=document.querySelectorAll('.stat-card .stat-sub')[3];
+  if(workedLabel)workedLabel.textContent='жил ажилласан';
+  document.querySelectorAll('.module-card .activity-info strong').forEach(element=>{if(element.textContent==='Үндсэн цалин')element.parentElement.nextElementSibling.textContent=employee.salary;});
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
@@ -26,5 +37,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('appView').classList.remove('hidden');
     render();
+    refreshEmployeeNumbers();
   };
 });

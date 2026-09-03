@@ -29,7 +29,9 @@ def load_employees():
                     break
             column -= 1
             inline = cell.find("main:is/main:t", namespace)
-            value = inline.text if inline is not None and inline.text else ""
+            numeric = cell.find("main:v", namespace)
+            value = (inline.text if inline is not None and inline.text else
+                     numeric.text if numeric is not None and numeric.text else "")
             while len(values) <= column:
                 values.append("")
             values[column] = value
