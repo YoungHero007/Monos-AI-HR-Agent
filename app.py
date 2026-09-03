@@ -471,6 +471,34 @@ def load_admin_records() -> dict[str, pd.DataFrame]:
     }
 
 
+def render_ai_chat() -> None:
+    st.subheader("Monos HR AI chatbot")
+    st.caption("HR-ийн түгээмэл мэдээллийг хурдан хайх эсвэл ChatGPT рүү үргэлжлүүлэн асууна уу.")
+    with st.container(border=True):
+        st.link_button("ChatGPT нээх", "https://chatgpt.com/", use_container_width=False)
+        if "ai_chat_messages" not in st.session_state:
+            st.session_state.ai_chat_messages = [
+                {"role": "assistant", "content": "Сайн байна уу. Цалин, амралт, НДШ эсвэл HR-ийн талаар асуугаарай."}
+            ]
+        for message in st.session_state.ai_chat_messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        question = st.chat_input("HR асуултаа бичнэ үү...")
+        if question:
+            st.session_state.ai_chat_messages.append({"role": "user", "content": question})
+            lower_question = question.lower()
+            if "цалин" in lower_question:
+                answer = f"Таны сарын үндсэн цалин {get_employee()['salary']} байна."
+            elif "амралт" in lower_question or "чөлөө" in lower_question:
+                answer = f"Танд {get_employee()['leave_remaining']} хоногийн амралт үлдсэн байна."
+            elif "ндш" in lower_question or "нийгмийн" in lower_question:
+                answer = "Нийгмийн даатгалын мэдээллээ Нийгмийн даатгал хэсгээс шалгана уу."
+            else:
+                answer = "Энэ асуултад demo мэдээллээр хариулж чадсангүй. ChatGPT нээгээд үргэлжлүүлэн асуугаарай."
+            st.session_state.ai_chat_messages.append({"role": "assistant", "content": answer})
+            st.rerun()
+
+
 def dataframe_to_excel(dataframe: pd.DataFrame, filename: str) -> None:
     output = BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -548,6 +576,7 @@ def render_dashboard():
         st.caption("Эх сурвалж: legalinfo.mn")
     else:
         st.warning("legalinfo.mn-ээс live мэдээлэл татаж чадсангүй. Дараагийн удаа дахин оролдоно.")
+    render_ai_chat()
 
 
 def mongolian_number_words(number: int) -> str:
