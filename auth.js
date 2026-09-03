@@ -24,10 +24,22 @@ function refreshEmployeeNumbers(){
 document.addEventListener('DOMContentLoaded',()=>{
   const form=document.getElementById('loginForm');
   if(!form||!Array.isArray(window.HR_EMPLOYEES))return;
+  const demoCredentials=document.querySelector('.demo-note span');
+  if(demoCredentials)demoCredentials.textContent='Employee: EMP001 / EMP001 · HR Admin: HR001 / HR001';
   form.onsubmit=event=>{
     event.preventDefault();
     const username=document.getElementById('employeeId').value.trim().toUpperCase();
     const password=document.getElementById('password').value;
+    if(username==='HR001'&&password==='HR001'){
+      employee.name='HR Admin';
+      employee.fullName='Хүний нөөцийн админ';
+      employee.id='HR001';
+      employee.position='HR Administrator';
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('appView').classList.remove('hidden');
+      render('admin');
+      return;
+    }
     const record=window.HR_EMPLOYEES.find(item=>String(item.employee_id).toUpperCase()===username);
     if(!record||password!==String(record.employee_id)){
       alert('Employee ID эсвэл нууц үг буруу байна. Demo нууц үг нь Employee ID-тэй адил байна.');

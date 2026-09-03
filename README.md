@@ -42,6 +42,7 @@ Demo login:
 - `portal-links.js` - Legalinfo chatbot link and E-Mongolia social insurance action
 - `pharmacy-logo.css` - Монос Эмийн сан brand styling
 - `auth.js` - Excel employee-based login and profile mapping
+- `admin.js` - HR001 admin dashboard with request and certificate registers
 - `Monos_HR_Web_Test_Data_100_Employees.xlsx` - supplied test data
 
 ## Дараагийн production implementation

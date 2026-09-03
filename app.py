@@ -11,10 +11,11 @@ import streamlit.components.v1 as components
 ROOT = Path(__file__).parent
 
 
-def load_employees():
+def load_sheet(sheet_name):
     workbook = ROOT / "Monos_HR_Web_Test_Data_100_Employees.xlsx"
     with zipfile.ZipFile(workbook) as archive:
-        xml = ET.fromstring(archive.read("xl/worksheets/sheet2.xml"))
+        sheet_number = {"employees": 2, "requests": 3, "certificates": 9}[sheet_name]
+        xml = ET.fromstring(archive.read(f"xl/worksheets/sheet{sheet_number}.xml"))
     namespace = {"main": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
     rows = []
     for row in xml.findall("main:sheetData/main:row", namespace):
@@ -40,6 +41,10 @@ def load_employees():
     headers = rows[0]
     return [dict(zip(headers, row)) for row in rows[1:]]
 
+
+def load_employees():
+    return load_sheet("employees")
+
 st.set_page_config(
     page_title="Monos HR | Employee Portal",
     page_icon="📊",
@@ -50,10 +55,13 @@ st.set_page_config(
 html_path = ROOT / "index.html"
 html = html_path.read_text(encoding="utf-8")
 employee_data = json.dumps(load_employees(), ensure_ascii=False)
+request_data = json.dumps(load_sheet("requests"), ensure_ascii=False)
+certificate_data = json.dumps(load_sheet("certificates"), ensure_ascii=False)
 css = (ROOT / "styles.css").read_text(encoding="utf-8")
 logo_css = (ROOT / "pharmacy-logo.css").read_text(encoding="utf-8")
 javascript = (ROOT / "app.js").read_text(encoding="utf-8")
 auth = (ROOT / "auth.js").read_text(encoding="utf-8")
+admin = (ROOT / "admin.js").read_text(encoding="utf-8")
 salary_pdf = (ROOT / "salary-pdf.js").read_text(encoding="utf-8")
 mail_config = (ROOT / "mail-config.js").read_text(encoding="utf-8")
 jobs = (ROOT / "jobs.js").read_text(encoding="utf-8")
@@ -61,7 +69,7 @@ portal_links = (ROOT / "portal-links.js").read_text(encoding="utf-8")
 template = base64.b64encode((ROOT / "Тодорхойлолт загвар.pdf").read_bytes()).decode("ascii")
 html = html.replace(
     '<script src="app.js"></script>',
-    f"<script>window.HR_EMPLOYEES={employee_data};</script><script src=\"app.js\"></script>",
+    f"<script>window.HR_EMPLOYEES={employee_data};window.HR_REQUESTS={request_data};window.HR_CERTIFICATES={certificate_data};</script><script src=\"app.js\"></script>",
 ).replace(
     '<link rel="stylesheet" href="styles.css" />',
     f"<style>{css}{logo_css}</style>",
@@ -71,6 +79,9 @@ html = html.replace(
 ).replace(
     '<script src="auth.js"></script>',
     f"<script>{auth}</script>",
+).replace(
+    '<script src="admin.js"></script>',
+    f"<script>{admin}</script>",
 ).replace(
     '<script src="salary-pdf.js"></script>',
     f"<script>{salary_pdf}</script>",
