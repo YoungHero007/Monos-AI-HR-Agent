@@ -685,7 +685,7 @@ def render_salary():
         )
 
     with col2:
-        st.subheader("Ажлын тодорхойлолт")
+        st.subheader("Ажлын тодорхойлолтын сонголтууд")
         st.write("Таны албан тушаалын зорилго, үүрэг, шаардлагыг харах болон PDF татах боломжтой.")
 
         pdf_bytes = generate_work_contract_pdf(recipient, document_number, document_date)
@@ -696,6 +696,7 @@ def render_salary():
             file_name="Monos_Ajlyn_Todorhoilolt.pdf",
             mime="application/pdf",
             key="certificate_pdf_download",
+            use_container_width=True,
         )
 
         subject = f"Ажлын тодорхойлолт - {employee['full_name']}"
