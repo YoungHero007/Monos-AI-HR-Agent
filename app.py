@@ -689,11 +689,13 @@ def render_salary():
         st.write("Таны албан тушаалын зорилго, үүрэг, шаардлагыг харах болон PDF татах боломжтой.")
 
         pdf_bytes = generate_work_contract_pdf(recipient, document_number, document_date)
+        st.markdown("#### Баримт бичгийн үйлдлүүд")
         st.download_button(
             label="PDF татах",
             data=pdf_bytes,
             file_name="Monos_Ajlyn_Todorhoilolt.pdf",
             mime="application/pdf",
+            key="certificate_pdf_download",
         )
 
         subject = f"Ажлын тодорхойлолт - {employee['full_name']}"
@@ -710,7 +712,11 @@ def render_salary():
             "Хавсаргасан PDF-ийг татаж авах боломжтой.\n\n"
             "Энэхүү баримт бичгийг тавтай морилно уу."
         )
-        st.link_button("HR бүртгэлд илгээх", generate_gmail_compose(HR_EMAIL, subject, body))
+        st.link_button(
+            "HR бүртгэлд илгээх",
+            generate_gmail_compose(HR_EMAIL, subject, body),
+            use_container_width=True,
+        )
         st.caption("Gmail нээгдсэний дараа from хаягийг ulziiuuree22@gmail.com сонгоод Send дарна.")
 
 
