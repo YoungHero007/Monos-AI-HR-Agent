@@ -531,6 +531,7 @@ def next_certificate_number(employee_id: str) -> str:
 
 def register_pdf_fonts() -> None:
     font_candidates = [
+        (Path(__file__).with_name("NotoSans-Regular.ttf"), Path(__file__).with_name("NotoSans-Bold.ttf")),
         (Path(r"C:\Windows\Fonts\arial.ttf"), Path(r"C:\Windows\Fonts\arialbd.ttf")),
         (Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"), Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")),
     ]
