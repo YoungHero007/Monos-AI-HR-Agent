@@ -18,17 +18,7 @@ Demo login:
 
 ## Одоогийн demo боломжууд
 
-- Employee login screen
-- Excel workbook-аас ажилтны нэр, ID, албан тушаал, хэлтэс, салбар, цалин, амралт, email мэдээлэл уншина
-- Нэвтэрсэн ажилтны нэр, ID, avatar болон chatbot-ийн мэндчилгээ тухайн Excel мөрөөс гарна
-- Dashboard-ийн ажилласан жил, цалин, амралтын тоонууд тухайн Excel мөрөөс гарна
-- Salary болон certificate flow, PDF тодорхойлолт татах
-- Leave balance болон leave request form
-- Schedule, orders, social insurance болон personal information
-- HR question form, chatbot, Legalinfo болон E-Mongolia холбоосууд
-- Monos Group-ийн Zangia нээлттэй ажлын байр
-- Responsive Monos Эмийн сан portal болон mobile sidebar
-
+- HR Admin dashboard-оос portal хүсэлтүүдийг Excel файлаар татна
 ## Файлууд
 
 - `app.py` - Streamlit entrypoint
