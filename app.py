@@ -449,16 +449,16 @@ def generate_gmail_compose(recipient: str, subject: str, body: str) -> str:
     return f"https://mail.google.com/mail/?{query}"
 
 
-def load_legal_info() -> list[tuple[str, str]]:
+def load_legal_info() -> list[tuple[str, str, str]]:
     try:
         response = requests.get(LEGALINFO_URL, timeout=20, headers={"Accept": "text/plain"})
         response.raise_for_status()
         text = response.text
         matches = re.findall(
-            r"\[([^\]]+)\]\(https?:\/\/legalinfo\.mn\/mn\/law\/\d+\)\s*\((\d+)\)",
+            r"\[([^\]]+)\]\((https?:\/\/legalinfo\.mn\/mn\/law\/\d+)\)\s*\((\d+)\)",
             text,
         )
-        return [(label.strip(), count) for label, count in matches[:5]]
+        return [(label.strip(), url, count) for label, url, count in matches[:5]]
     except Exception:
         return []
 
@@ -613,8 +613,8 @@ def render_dashboard():
     st.subheader("Live эрх зүйн мэдээлэл")
     legal_items = load_legal_info()
     if legal_items:
-        for label, count in legal_items:
-            st.markdown(f"- **{label}** — {count}")
+        for label, url, count in legal_items:
+            st.markdown(f"- [{label}]({url}) — {count}")
         st.caption("Эх сурвалж: legalinfo.mn")
     else:
         st.warning("legalinfo.mn-ээс live мэдээлэл татаж чадсангүй. Дараагийн удаа дахин оролдоно.")
