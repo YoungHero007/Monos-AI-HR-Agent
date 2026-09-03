@@ -1,4 +1,4 @@
-﻿const employee={name:'Батзориг',fullName:'Батзориг Энхтөр',id:'EMP001',position:'Брэнд менежер',department:'Маркетинг',branch:'Төв оффис',salary:'2,500,000 ₮',leaveTotal:15,leaveUsed:8,leaveRemaining:7,email:'batzorig@monos.mn',phone:'+976 99112233'};
+﻿const employee={name:'Батзориг',fullName:'Батзориг Энхтөр',id:'EMP001',position:'Брэнд менежер',department:'Маркетинг',branch:'Төв оффис',salary:'2,500,000 ₮',leaveTotal:15,leaveUsed:8,leaveRemaining:7,email:'ulziiuuree22@gmail.com',phone:'+976 99112233'};
 const HR_EMAIL='monosubmonos@gmail.com';
 const LEGALINFO_URL='https://r.jina.ai/http://legalinfo.mn/mn';
 const navNames={dashboard:'Dashboard',salary:'Цалин',leave:'Амралт, чөлөө',schedule:'Ээлжийн хуваарь',orders:'Тушаал',social:'Нийгмийн даатгал',profile:'Хувийн мэдээлэл',hr:'HR-д асуулт',admin:'Admin mode'};

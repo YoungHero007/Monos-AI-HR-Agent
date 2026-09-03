@@ -28,6 +28,9 @@ Demo login:
 - Personal information update form
 - HR question form
 - Leave болон HR хүсэлтийг `monosubmonos@gmail.com` руу recipient, subject, body нь бөглөгдсөн email draft болгон нээх
+- Ажилтны илгээгчийн мэдээлэл: `ulziiuuree22@gmail.com`
+- Хүсэлт хүлээн авах HR хаяг: `monosubmonos@gmail.com`
+- `Тодорхойлолт загвар.pdf` файлыг salary хэсгийн template татах үйлдэлд холбосон
 - Admin overview
 - Excel import entry point
 - Mongolian Monos HR AI chatbot demo
