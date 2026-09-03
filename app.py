@@ -255,6 +255,15 @@ HR_EMAIL = "monosubmonos@gmail.com"
 LEGALINFO_URL = "https://r.jina.ai/http://legalinfo.mn/mn"
 EMPLOYEE_DATA_FILE = Path(__file__).with_name("Monos_HR_Web_Test_Data_100_Employees.xlsx")
 USER_DATABASE_FILE = Path(os.getenv("USER_DATABASE_FILE", Path(__file__).with_name("users.db")))
+HR_ADMIN = {
+    "id": "HR001",
+    "name": "Хандсүрэн",
+    "surname": "Батбаяр",
+    "full_name": "Батбаяр Хандсүрэн",
+    "email": "monosubmonos@gmail.com",
+    "phone": "77181883",
+    "role": "Хүний нөөцийн админ",
+}
 
 NAV_ITEMS = {
     "dashboard": "Dashboard",
@@ -365,6 +374,8 @@ def bootstrap_users(records: dict[str, dict]) -> int:
 
 
 def authenticate_user(employee_id: str, password: str) -> dict | None:
+    if employee_id.strip().upper() == HR_ADMIN["id"] and password == "HR001":
+        return {**HR_ADMIN, "is_admin": True}
     password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
     with sqlite3.connect(USER_DATABASE_FILE) as connection:
         row = connection.execute(
@@ -422,6 +433,29 @@ def load_legal_info() -> list[tuple[str, str]]:
         return []
 
 
+def load_admin_records() -> dict[str, pd.DataFrame]:
+    workbook = pd.ExcelFile(EMPLOYEE_DATA_FILE)
+    return {
+        "salary": pd.read_excel(workbook, sheet_name=8),
+        "leave": pd.read_excel(workbook, sheet_name=2),
+        "orders": pd.read_excel(workbook, sheet_name=4),
+        "profile": pd.read_excel(workbook, sheet_name=1),
+    }
+
+
+def dataframe_to_excel(dataframe: pd.DataFrame, filename: str) -> None:
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        dataframe.to_excel(writer, index=False, sheet_name="Бүртгэл")
+    st.download_button(
+        "Excel татах",
+        data=output.getvalue(),
+        file_name=filename,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key=f"download_{filename}",
+    )
+
+
 def render_login():
     monos_header()
     st.title("MONOS HR Portal")
@@ -441,7 +475,7 @@ def render_login():
             else:
                 st.error("Нэвтрэх мэдээлэл буруу байна.")
 
-    st.info("Бүх ажилтны ID + demo123 нууц үгээр нэвтэрнэ.")
+    st.info("Ажилтан: ID + demo123 | HR admin: HR001 / HR001")
 
 
 def render_dashboard():
@@ -876,11 +910,34 @@ def render_hr():
 
 def render_admin():
     monos_header()
-    st.title("Admin mode")
-    st.caption("Системийн тойм болон статус.")
-    st.markdown("- Идэвхтэй ажилтнууд — 128")
-    st.markdown("- Үйлдэлтэй хүсэлт — 18")
-    st.markdown("- Системийн төлөв — Healthy")
+    st.title("HR Admin dashboard")
+    st.caption(f"{HR_ADMIN['full_name']} · {HR_ADMIN['email']} · {HR_ADMIN['phone']}")
+    records = load_admin_records()
+    employees = records["profile"][["employee_id", "Овог", "Нэр", "Имэйл", "Утас"]].copy()
+    for frame in records.values():
+        frame["Ажилтны нэр"] = frame["employee_id"].map(
+            employees.set_index("employee_id").apply(lambda row: f"{row['Овог']} {row['Нэр']}", axis=1)
+        )
+
+    salary_tab, leave_tab, orders_tab, profile_tab = st.tabs(
+        ["Цалин", "Амралт, чөлөө", "Тушаал", "Хувийн мэдээлэл"]
+    )
+    with salary_tab:
+        st.subheader("Цалингийн бүртгэл")
+        st.dataframe(records["salary"], use_container_width=True, hide_index=True)
+        dataframe_to_excel(records["salary"], "HR_Цалингийн_бүртгэл.xlsx")
+    with leave_tab:
+        st.subheader("Амралт, чөлөөний хүсэлтүүд")
+        st.dataframe(records["leave"], use_container_width=True, hide_index=True)
+        dataframe_to_excel(records["leave"], "HR_Амралт_чөлөөний_хүсэлт.xlsx")
+    with orders_tab:
+        st.subheader("Компанийн тушаал")
+        st.dataframe(records["orders"], use_container_width=True, hide_index=True)
+        dataframe_to_excel(records["orders"], "HR_Компанийн_тушаал.xlsx")
+    with profile_tab:
+        st.subheader("Ажилтны хувийн мэдээлэл")
+        st.dataframe(records["profile"], use_container_width=True, hide_index=True)
+        dataframe_to_excel(records["profile"], "HR_Ажилтны_хувийн_мэдээлэл.xlsx")
 
 
 def render_page(page_name: str):
@@ -912,11 +969,11 @@ else:
     if "current_page" not in st.session_state:
         st.session_state.current_page = "dashboard"
 
-    pages = list(NAV_ITEMS.keys())
+    pages = ["admin"] if st.session_state.employee.get("is_admin") else list(NAV_ITEMS.keys())
     with st.sidebar:
         st.title("MONOS HR")
         selection = st.selectbox("Navigation", options=pages, index=pages.index(st.session_state.current_page), format_func=lambda x: NAV_ITEMS[x])
         st.session_state.current_page = selection
         st.button("Logout", on_click=lambda: st.session_state.__setitem__("authenticated", False))
 
-    render_page(st.session_state.current_page)
+    render_page("admin" if st.session_state.employee.get("is_admin") else st.session_state.current_page)
