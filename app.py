@@ -470,6 +470,7 @@ def render_login():
             selected_employee = authenticate_user(employee_id, password)
             if selected_employee:
                 st.session_state.employee = selected_employee.copy()
+                st.session_state.current_page = "admin" if selected_employee.get("is_admin") else "dashboard"
                 st.session_state.authenticated = True
                 st.rerun()
             else:
@@ -970,6 +971,8 @@ else:
         st.session_state.current_page = "dashboard"
 
     pages = ["admin"] if st.session_state.employee.get("is_admin") else list(NAV_ITEMS.keys())
+    if st.session_state.current_page not in pages:
+        st.session_state.current_page = pages[0]
     with st.sidebar:
         st.title("MONOS HR")
         selection = st.selectbox("Navigation", options=pages, index=pages.index(st.session_state.current_page), format_func=lambda x: NAV_ITEMS[x])
