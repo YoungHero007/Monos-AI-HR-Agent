@@ -1,10 +1,26 @@
 from __future__ import annotations
 
 import re
+import hashlib
+import json
+import os
+import sqlite3
 from datetime import datetime
+from io import BytesIO
+from pathlib import Path
 
 import requests
+import pandas as pd
 import streamlit as st
+from pypdf import PdfReader, PdfWriter
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.fonts import addMapping
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 st.set_page_config(page_title="MONOS HR Portal", page_icon="🧑‍💼", layout="wide")
 
@@ -223,6 +239,10 @@ EMPLOYEE = {
     "leave_remaining": 7,
     "email": "batzorig@monos.mn",
     "phone": "+976 99112233",
+    "surname": "Энхтөр",
+    "registry_number": "ТЕСТ20260000",
+    "salary_amount": 2500000,
+    "hire_date": "2024-01-10",
     "marital_status": "Гэрлэсэн",
     "emergency_contact_name": "Энхжаргал Бат",
     "emergency_contact_phone": "+976 99112244",
@@ -233,6 +253,8 @@ EMPLOYEE = {
 
 HR_EMAIL = "monosubmonos@gmail.com"
 LEGALINFO_URL = "https://r.jina.ai/http://legalinfo.mn/mn"
+EMPLOYEE_DATA_FILE = Path(__file__).with_name("Monos_HR_Web_Test_Data_100_Employees.xlsx")
+USER_DATABASE_FILE = Path(os.getenv("USER_DATABASE_FILE", Path(__file__).with_name("users.db")))
 
 NAV_ITEMS = {
     "dashboard": "Dashboard",
@@ -258,6 +280,105 @@ def get_employee() -> dict:
     return st.session_state.employee
 
 
+def load_employee_records() -> dict[str, dict]:
+    records = {}
+    employees = pd.read_excel(EMPLOYEE_DATA_FILE, sheet_name="Ажилтан")
+    leave_requests = pd.read_excel(EMPLOYEE_DATA_FILE, sheet_name="Чөлөө_хүсэлт")
+    request_counts = leave_requests.groupby("employee_id").size().to_dict()
+    for _, row in employees.iterrows():
+        employee_id = str(row.get("employee_id", "")).strip()
+        if not employee_id or employee_id.lower() == "nan":
+            continue
+        first_name = str(row.get("Нэр", "")).strip()
+        last_name = str(row.get("Овог", "")).strip()
+        full_name = " ".join(part for part in (last_name, first_name) if part and part.lower() != "nan")
+        records[employee_id.upper()] = {
+            **EMPLOYEE,
+            "id": employee_id.upper(),
+            "name": first_name if first_name.lower() != "nan" else EMPLOYEE["name"],
+            "surname": last_name if last_name.lower() != "nan" else "",
+            "full_name": full_name or EMPLOYEE["full_name"],
+            "phone": str(row.get("Утас", EMPLOYEE["phone"])),
+            "email": str(row.get("Имэйл", EMPLOYEE["email"])),
+            "registry_number": str(row.get("Регистрийн дугаар", "")),
+            "position": str(row.get("Албан тушаал", EMPLOYEE["position"])),
+            "department": str(row.get("Хэлтэс", EMPLOYEE["department"])),
+            "branch": str(row.get("Салбар", EMPLOYEE["branch"])),
+            "salary": f"{int(row.get('Үндсэн цалин', 0)):,} ₮",
+            "leave_total": int(row.get("Жилийн амралтын хоног", EMPLOYEE["leave_total"])),
+            "leave_remaining": int(row.get("Үлдсэн амралтын хоног", EMPLOYEE["leave_remaining"])),
+            "salary_amount": int(row.get("Үндсэн цалин", 0)),
+            "hire_date": row.get("Ажилд орсон огноо"),
+        }
+        records[employee_id.upper()]["leave_used"] = (
+            records[employee_id.upper()]["leave_total"] - records[employee_id.upper()]["leave_remaining"]
+        )
+        hire_date = pd.to_datetime(row.get("Ажилд орсон огноо"), errors="coerce")
+        if pd.notna(hire_date):
+            today = datetime.now()
+            years = today.year - hire_date.year - ((today.month, today.day) < (hire_date.month, hire_date.day))
+            anniversary = hire_date.replace(year=hire_date.year + years)
+            months = (today.year - anniversary.year) * 12 + today.month - anniversary.month
+            if today.day < anniversary.day:
+                months -= 1
+            records[employee_id.upper()]["service_years"] = max(years, 0)
+            records[employee_id.upper()]["service_months"] = max(months, 0)
+        else:
+            records[employee_id.upper()]["service_years"] = 0
+            records[employee_id.upper()]["service_months"] = 0
+        records[employee_id.upper()]["request_count"] = int(request_counts.get(employee_id, 0))
+    return records
+
+
+EMPLOYEE_RECORDS = load_employee_records()
+
+
+def bootstrap_users(records: dict[str, dict]) -> int:
+    password_hash = hashlib.sha256("demo123".encode("utf-8")).hexdigest()
+    with sqlite3.connect(USER_DATABASE_FILE) as connection:
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                employee_id TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL,
+                profile_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        now = datetime.now().isoformat(timespec="seconds")
+        for employee_id, profile in records.items():
+            connection.execute(
+                """
+                INSERT INTO users (employee_id, password_hash, profile_json, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(employee_id) DO UPDATE SET
+                    password_hash = excluded.password_hash,
+                    profile_json = excluded.profile_json,
+                    updated_at = excluded.updated_at
+                """,
+                (employee_id, password_hash, json.dumps(profile, ensure_ascii=False, default=str), now, now),
+            )
+        connection.commit()
+        return int(connection.execute("SELECT COUNT(*) FROM users").fetchone()[0])
+
+
+def authenticate_user(employee_id: str, password: str) -> dict | None:
+    password_hash = hashlib.sha256(password.encode("utf-8")).hexdigest()
+    with sqlite3.connect(USER_DATABASE_FILE) as connection:
+        row = connection.execute(
+            "SELECT password_hash, profile_json FROM users WHERE employee_id = ?",
+            (employee_id.strip().upper(),),
+        ).fetchone()
+    if not row or row[0] != password_hash:
+        return None
+    return json.loads(row[1])
+
+
+BOOTSTRAPPED_USER_COUNT = bootstrap_users(EMPLOYEE_RECORDS)
+
+
 def generate_mailto(recipient: str, subject: str, body: str) -> str:
     import urllib.parse
 
@@ -269,6 +390,22 @@ def generate_mailto(recipient: str, subject: str, body: str) -> str:
         + "&body="
         + urllib.parse.quote(body)
     )
+
+
+def generate_gmail_compose(recipient: str, subject: str, body: str) -> str:
+    import urllib.parse
+
+    query = urllib.parse.urlencode(
+        {
+            "view": "cm",
+            "fs": "1",
+            "authuser": "ulziiuuree22@gmail.com",
+            "to": recipient,
+            "su": subject,
+            "body": body,
+        }
+    )
+    return f"https://mail.google.com/mail/?{query}"
 
 
 def load_legal_info() -> list[tuple[str, str]]:
@@ -296,13 +433,15 @@ def render_login():
         submitted = st.form_submit_button("Login")
 
         if submitted:
-            if employee_id == EMPLOYEE["id"] and password == "demo123":
+            selected_employee = authenticate_user(employee_id, password)
+            if selected_employee:
+                st.session_state.employee = selected_employee.copy()
                 st.session_state.authenticated = True
                 st.rerun()
             else:
                 st.error("Нэвтрэх мэдээлэл буруу байна.")
 
-    st.info("Demo login: Employee: EMP001 / demo123 | Admin: admin / admin123")
+    st.info("Бүх ажилтны ID + demo123 нууц үгээр нэвтэрнэ.")
 
 
 def render_dashboard():
@@ -314,8 +453,8 @@ def render_dashboard():
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Сарын үндсэн цалин", employee["salary"])
     col2.metric("Үлдсэн амралт", f"{employee['leave_remaining']} хоног")
-    col3.metric("Хүсэлтүүд", "2")
-    col4.metric("Ажилласан", "4.2 жил 2 сар")
+    col3.metric("Хүсэлтүүд", employee["request_count"])
+    col4.metric("Ажилласан", f"{employee['service_years']} жил {employee['service_months']} сар")
 
     left, right = st.columns([2, 1])
 
@@ -348,6 +487,179 @@ def render_dashboard():
         st.warning("legalinfo.mn-ээс live мэдээлэл татаж чадсангүй. Дараагийн удаа дахин оролдоно.")
 
 
+def mongolian_number_words(number: int) -> str:
+    ones = ["тэг", "нэг", "хоёр", "гурав", "дөрөв", "тав", "зургаа", "долоо", "найм", "ес"]
+    tens = ["", "", "хорь", "гуч", "дөч", "тавь", "жар", "дал", "ная", "ер"]
+    if number < 10:
+        return ones[number]
+    if number < 20:
+        return "арван " + ones[number - 10]
+    if number < 100:
+        return tens[number // 10] if number % 10 == 0 else tens[number // 10] + "ан " + ones[number % 10]
+    if number < 1000:
+        return ones[number // 100] + " зуун" if number % 100 == 0 else ones[number // 100] + " зуун " + mongolian_number_words(number % 100)
+    if number < 1_000_000:
+        thousands = number // 1000
+        remainder = number % 1000
+        result = mongolian_number_words(thousands) + " мянга"
+        return result if remainder == 0 else result + " " + mongolian_number_words(remainder)
+    millions = number // 1_000_000
+    remainder = number % 1_000_000
+    result = mongolian_number_words(millions) + " сая"
+    return result if remainder == 0 else result + " " + mongolian_number_words(remainder)
+
+
+def recipient_in_dative_case(recipient: str) -> str:
+    recipient = recipient.strip()
+    if not recipient:
+        return "................................ -д"
+    if recipient.lower().endswith("банк"):
+        return recipient[:-4] + "банкинд"
+    if recipient.endswith(("д", "т", "н")):
+        return recipient + "д"
+    return recipient + "д"
+
+
+def next_certificate_number(employee_id: str) -> str:
+    if "certificate_numbers" not in st.session_state:
+        st.session_state.certificate_numbers = {}
+    if employee_id not in st.session_state.certificate_numbers:
+        sequence = len(st.session_state.certificate_numbers) + 1
+        st.session_state.certificate_numbers[employee_id] = f"А/{datetime.now().year}-{sequence:03d}"
+    return st.session_state.certificate_numbers[employee_id]
+
+
+def generate_work_contract_pdf(recipient: str = "", document_number: str = "", document_date=None) -> bytes:
+    employee = get_employee()
+    template_path = Path(__file__).with_name("Тодорхойлолт загвар.pdf")
+    if not template_path.exists():
+        template_path = next(
+            (path for path in Path.home().joinpath("Downloads").glob("*.pdf") if "Тодорхойлолт" in path.name),
+            template_path,
+        )
+
+    if template_path.exists():
+        overlay_buffer = BytesIO()
+        overlay = canvas.Canvas(overlay_buffer, pagesize=A4)
+        pdfmetrics.registerFont(TTFont("ArialUnicode", r"C:\Windows\Fonts\arial.ttf"))
+        pdfmetrics.registerFont(TTFont("ArialUnicode-Bold", r"C:\Windows\Fonts\arialbd.ttf"))
+        overlay.setFillColorRGB(1, 1, 1)
+        overlay.rect(92, 300, 410, 270, fill=1, stroke=0)
+        overlay.setFillColorRGB(0, 0, 0)
+        overlay.setFont("ArialUnicode", 10.5)
+        overlay.drawString(115, 590, f"Дугаар: {document_number or '........'}")
+        overlay.drawRightString(490, 590, f"Огноо: {(document_date or datetime.now().date()).strftime('%Y-%m-%d')}")
+        salary_words = mongolian_number_words(employee["salary_amount"])
+        hire_date = pd.to_datetime(employee.get("hire_date"), errors="coerce")
+        if pd.notna(hire_date):
+            start_date = f"{hire_date.year} оны {hire_date.month}-р сараас"
+        else:
+            start_date = "ажилд орсон өдрөөс"
+        body_style = ParagraphStyle(
+            "EmbassyCertificateBody",
+            fontName="ArialUnicode",
+            fontSize=11,
+            leading=18,
+            alignment=TA_LEFT,
+            textColor="#111111",
+        )
+        body = (
+            f"<b>{recipient_in_dative_case(recipient)}</b><br/><br/>"
+            f"{employee['surname']} овогтой {employee['name']} /РД: {employee['registry_number']}/ нь "
+            f"“Монос Улаанбаатар” ХХК-ийн {employee['branch']} салбар эмийн санд "
+            f"{employee['position']} албан тушаалд {start_date} эхлэн ажиллаж байгаа бөгөөд "
+            f"сарын дундаж цалин нь {employee['salary_amount']:,} /{salary_words}/ төгрөг болно авдаг нь үнэн болно."
+            "<br/><br/>"
+            "Энэхүү тодорхойлолтыг гаргаснаар манай компани төлбөрийн болон бусад хариуцлага хүлээхгүй болно."
+        )
+        paragraph = Paragraph(body, body_style)
+        paragraph.wrapOn(overlay, 390, 180)
+        paragraph.drawOn(overlay, 105, 355)
+        overlay.setFont("ArialUnicode-Bold", 10.5)
+        overlay.drawString(125, 320, "ГҮЙЦЭТГЭХ ЗАХИРАЛ")
+        overlay.drawString(365, 320, "Л.АЛТАНЦОГТ")
+        overlay.setFont("ArialUnicode", 7.5)
+        overlay.setFillColorRGB(0.05, 0.42, 0.28)
+        overlay.drawString(365, 305, "eSign DEMO: VERIFIED")
+        overlay.save()
+
+        template_page = PdfReader(str(template_path)).pages[0]
+        overlay_page = PdfReader(BytesIO(overlay_buffer.getvalue())).pages[0]
+        template_page.merge_page(overlay_page)
+        output = BytesIO()
+        writer = PdfWriter()
+        writer.add_page(template_page)
+        writer.write(output)
+        return output.getvalue()
+
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=40,
+        rightMargin=40,
+        topMargin=40,
+        bottomMargin=40,
+    )
+    pdfmetrics.registerFont(TTFont("ArialUnicode", r"C:\Windows\Fonts\arial.ttf"))
+    pdfmetrics.registerFont(TTFont("ArialUnicode-Bold", r"C:\Windows\Fonts\arialbd.ttf"))
+    addMapping("ArialUnicode", 0, 0, "ArialUnicode")
+    addMapping("ArialUnicode", 1, 0, "ArialUnicode-Bold")
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "CertificateTitle",
+        parent=styles["Title"],
+        fontName="ArialUnicode-Bold",
+        fontSize=18,
+        leading=24,
+        alignment=TA_CENTER,
+        textColor="#111111",
+        spaceAfter=18,
+    )
+    body_style = ParagraphStyle(
+        "CertificateBody",
+        parent=styles["BodyText"],
+        fontName="ArialUnicode",
+        fontSize=11,
+        leading=17,
+        alignment=TA_LEFT,
+        textColor="#111111",
+        spaceAfter=7,
+    )
+    heading_style = ParagraphStyle(
+        "CertificateHeading",
+        parent=body_style,
+        fontName="ArialUnicode-Bold",
+        fontSize=12,
+        leading=18,
+        spaceBefore=9,
+        spaceAfter=8,
+    )
+    story = []
+
+    story.append(Paragraph("MONOS HR | АЛБАН ТОДОРХОЙЛОЛТ", title_style))
+    story.append(Spacer(1, 18))
+    story.append(Paragraph(f"Ажилтан: <b>{employee['full_name']}</b>", body_style))
+    story.append(Paragraph(f"Албан тушаал: <b>{employee['position']}</b>", body_style))
+    story.append(Paragraph(f"Хэлтэс: <b>{employee['department']}</b>", body_style))
+    story.append(Paragraph(f"Байршил: <b>{employee['branch']}</b>", body_style))
+    story.append(Paragraph(f"Имэйл: <b>{employee['email']}</b>", body_style))
+    story.append(Paragraph(f"Утас: <b>{employee['phone']}</b>", body_style))
+    story.append(Spacer(1, 16))
+    story.append(Paragraph("Ажлын үүрэг, хариуцлага:", heading_style))
+    story.append(Paragraph("- Бүлэг болон компанийн зорилгод нийцүүлэн ажлын даалгавар гүйцэтгэх.", body_style))
+    story.append(Paragraph("- Ажлын цагийн дэглэм, аюулгүй байдал, ёс зүй, баримт бичгийн менежментэд анхаарах.", body_style))
+    story.append(Paragraph("- Хариуцлагатай, ёс зүйтэй, нээлттэй хамтран ажиллах.", body_style))
+    story.append(Spacer(1, 16))
+    story.append(Paragraph(f"Мэргэжил: <b>{employee['profession']}</b>", body_style))
+    story.append(Paragraph(f"Мэргэшсэн эсэх: <b>{employee['qualification']}</b>", body_style))
+    story.append(Paragraph(f"Бүртгэсэн огноо: <b>{datetime.now().strftime('%Y-%m-%d')}</b>", body_style))
+
+    doc.build(story)
+    return buffer.getvalue()
+
+
 def render_salary():
     monos_header()
     employee = get_employee()
@@ -359,6 +671,11 @@ def render_salary():
         st.subheader("Цалингийн тодорхойлолт")
         start_date = st.date_input("Эхлэх огноо", value=datetime(2026, 1, 1).date())
         end_date = st.date_input("Дуусах огноо", value=datetime(2026, 8, 28).date())
+        document_number = next_certificate_number(employee["id"])
+        st.text_input("Албан тоотын дугаар", value=document_number, disabled=True)
+        document_date = st.date_input("Албан тоотын огноо", value=datetime.now().date())
+        recipient = st.text_input("Ямар газарт", placeholder="Жишээ: Хаан банк")
+        st.caption("Албан тоотын дугаарыг систем автоматаар бүртгэлээ.")
         st.metric("Үндсэн цалин", employee["salary"])
         st.download_button(
             label="Template татах",
@@ -370,8 +687,31 @@ def render_salary():
     with col2:
         st.subheader("Ажлын тодорхойлолт")
         st.write("Таны албан тушаалын зорилго, үүрэг, шаардлагыг харах болон PDF татах боломжтой.")
-        if st.button("PDF татах"):
-            st.success("Ажлын тодорхойлолтын PDF бэлэн боллоо (demo).")
+
+        pdf_bytes = generate_work_contract_pdf(recipient, document_number, document_date)
+        st.download_button(
+            label="PDF татах",
+            data=pdf_bytes,
+            file_name="Monos_Ajlyn_Todorhoilolt.pdf",
+            mime="application/pdf",
+        )
+
+        subject = f"Ажлын тодорхойлолт - {employee['full_name']}"
+        body = (
+            "Сайн байна уу,\n\n"
+            f"Ажилтан: {employee['full_name']}\n"
+            "Илгээгч: ulziiuuree22@gmail.com\n"
+            f"Албан тоотын дугаар: {document_number}\n"
+            f"Албан тоотын огноо: {document_date}\n"
+            f"Хэнд: {recipient_in_dative_case(recipient)}\n"
+            f"Албан тушаал: {employee['position']}\n"
+            f"Имэйл: {employee['email']}\n"
+            "Гүйцэтгэх захирлын eSign: DEMO VERIFIED\n"
+            "Хавсаргасан PDF-ийг татаж авах боломжтой.\n\n"
+            "Энэхүү баримт бичгийг тавтай морилно уу."
+        )
+        st.link_button("HR бүртгэлд илгээх", generate_gmail_compose(HR_EMAIL, subject, body))
+        st.caption("Gmail нээгдсэний дараа from хаягийг ulziiuuree22@gmail.com сонгоод Send дарна.")
 
 
 def render_leave():
@@ -397,6 +737,7 @@ def render_leave():
                 body = (
                     "Сайн байна уу, HR багийнхаан,\n\n"
                     f"Ажилтан: {employee['full_name']}\n"
+                    "Илгээгч: ulziiuuree22@gmail.com\n"
                     f"Employee ID: {employee['id']}\n"
                     f"Чөлөөний төрөл: {leave_type}\n"
                     f"Эхлэх огноо: {start_date}\n"
@@ -405,8 +746,8 @@ def render_leave():
                     f"Шалтгаан: {reason or 'Тодорхой шалтгаан оруулаагүй'}\n\n"
                     "Энэхүү хүсэлтийг хүлээн авч шийдвэрлэнэ үү."
                 )
-                st.markdown(f"[HR руу илгээх]({generate_mailto(HR_EMAIL, subject, body)})")
-                st.success("Хүсэлт бэлэн боллоо. Mail client нээгдэх болно.")
+                st.link_button("Gmail-ээр HR руу илгээх", generate_gmail_compose(HR_EMAIL, subject, body))
+                st.caption("Gmail нээгдсэний дараа from хаягийг ulziiuuree22@gmail.com сонгоод Send дарна.")
 
     with right:
         st.subheader("Амралтын мэдээлэл")
@@ -500,13 +841,14 @@ def render_hr():
             body = (
                 "Сайн байна уу, HR багийнхаан,\n\n"
                 f"Ажилтан: {employee['full_name']}\n"
+                "Илгээгч: ulziiuuree22@gmail.com\n"
                 f"Employee ID: {employee['id']}\n"
                 f"Ангилал: {category}\n"
                 f"Асуулт: {question or 'Асуулт оруулаагүй'}\n\n"
                 "Хариу өгнө үү."
             )
-            st.markdown(f"[HR руу илгээх]({generate_mailto(HR_EMAIL, subject, body)})")
-            st.success("Асуулт бэлэн боллоо. Mail client нээгдэх болно.")
+            st.link_button("Gmail-ээр HR руу илгээх", generate_gmail_compose(HR_EMAIL, subject, body))
+            st.caption("Gmail нээгдсэний дараа from хаягийг ulziiuuree22@gmail.com сонгоод Send дарна.")
 
 
 def render_admin():
