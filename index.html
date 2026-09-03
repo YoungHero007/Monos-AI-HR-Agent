@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streamlit / Gradio (AI demo)</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="Streamlit Gradio AI demo">
+          <span class="brand-icon" aria-hidden="true"></span>
+          <div class="brand-text">
+            <span class="brand-main">Streamlit</span>
+            <span class="brand-slash">/</span>
+            <span class="brand-main">Gradio</span>
+            <span class="brand-demo">(AI demo)</span>
+          </div>
+        </div>
+      </header>
+
+      <p class="intro-text">
+        Chatbot, dashboard, AI demo — суралтын хамгаийн түргэн мэдээлэл. Энэ заавар нь sandbox дээр ажиллахад
+        шаардлагатай бүх зүйлсийг нэг дор тайлбарладаг.
+      </p>
+
+      <div class="section-label">STREAMLIT — 3 ФАЙЛ</div>
+
+      <section class="step-card">
+        <div class="step-row">
+          <span class="step-no">1.</span>
+          <span class="file-name">requirements.txt</span>
+        </div>
+
+        <div class="code-block code-dark">
+          <pre>streamlit
+pandas
+openai</pre>
+        </div>
+
+        <p class="helper-text">Ашигласан бүх сангаа бич.</p>
+      </section>
+
+      <section class="step-card">
+        <div class="step-row">
+          <span class="step-no">2.</span>
+          <span class="file-name">Profile</span>
+        </div>
+
+        <div class="code-block code-blue">
+          <pre>web: streamlit run app.py --server.port 8501 --server.address 0.0.0.0</pre>
+        </div>
+
+        <div class="warning-box">
+          <div class="warning-bar" aria-hidden="true"></div>
+          <div class="warning-text">
+            <code>--server.address 0.0.0.0</code> байхгүй бол сайт хэзээ ч нээгдэхгүй. Порт <span>8501</span> нь дараа
+            нь <strong>Container Port</strong> болно.
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

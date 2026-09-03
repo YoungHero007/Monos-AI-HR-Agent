@@ -1,0 +1,246 @@
+﻿:root {
+  --bg: #eef2f0;
+  --panel: #f8f9f8;
+  --line: #dfe4e0;
+  --text: #111827;
+  --muted: #5d6670;
+  --navy: #0b1c2c;
+  --navy-2: #0e2b3d;
+  --blue: #2f7ad6;
+  --warning: #f5e9ae;
+  --warning-accent: #d4b356;
+  --shadow: 0 14px 30px rgba(15, 32, 39, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  padding: 18px 18px 36px;
+}
+
+.page-shell {
+  width: min(1240px, 100%);
+  background: transparent;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  padding: 8px 0 18px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #6db8ff 0 30%, #52b98d 30% 60%, #f4c565 60% 100%);
+  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08);
+}
+
+.brand-text {
+  font-weight: 800;
+  font-size: clamp(2rem, 2.8vw, 3.4rem);
+  letter-spacing: -0.07em;
+  line-height: 1.1;
+  color: #111827;
+}
+
+.brand-main {
+  display: inline-block;
+}
+
+.brand-slash {
+  color: #1a2430;
+  opacity: 0.9;
+}
+
+.brand-demo {
+  font-size: 0.52em;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: #4f5b67;
+  margin-left: 5px;
+}
+
+.intro-text {
+  margin: 8px 0 18px;
+  max-width: 1150px;
+  color: #2f3a45;
+  font-size: 1.18rem;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+
+.section-label {
+  margin: 26px 0 18px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  color: #1c4fab;
+  text-transform: uppercase;
+}
+
+.step-card {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.step-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: #101827;
+}
+
+.step-no {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.file-name {
+  display: inline-block;
+  padding: 7px 14px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #f3f7fb;
+  border-radius: 8px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.code-block {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 25, 40, 0.08);
+  box-shadow: var(--shadow);
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 18px 20px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 1.12rem;
+  line-height: 1.9;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.code-dark {
+  background: #071a2a;
+  color: #edf3f7;
+}
+
+.code-dark pre {
+  color: #dfeaf2;
+}
+
+.code-blue {
+  background: linear-gradient(180deg, #0f5dd1 0%, #0a63d7 100%);
+  color: #f7fbff;
+}
+
+.code-blue pre {
+  color: #eef8ff;
+}
+
+.helper-text {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.warning-box {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 18px;
+  background: #f3f0e6;
+  border: 1px solid #e7e2d0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.warning-bar {
+  width: 6px;
+  background: var(--warning-accent);
+}
+
+.warning-text {
+  padding: 14px 16px;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: #1c2730;
+}
+
+.warning-text code {
+  background: rgba(255,255,255,0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-weight: 700;
+}
+
+.warning-text span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #111827;
+  color: #f3f5f7;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.warning-text strong {
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 14px 12px 28px;
+  }
+
+  .brand-text {
+    font-size: 2.2rem;
+  }
+
+  .intro-text {
+    font-size: 1rem;
+  }
+
+  .section-label {
+    font-size: 0.92rem;
+  }
+
+  .code-block pre {
+    font-size: 0.96rem;
+  }
+}
