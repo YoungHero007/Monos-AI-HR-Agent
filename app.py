@@ -32,80 +32,179 @@ st.markdown(
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
         :root {
-                --monos-bg: #f5f2ec;
-                --monos-card: #fffdfa;
-                --monos-panel: #f9f7f2;
-                --monos-primary: #173b35;
-                --monos-primary-soft: #2d6757;
-                --monos-accent: #c49a52;
-                --monos-accent-soft: #f1e4c9;
-                --monos-text: #202622;
-                --monos-muted: #6d766f;
-                --monos-border: #e4ded2;
-                --monos-shadow: 0 18px 45px rgba(35, 52, 43, 0.08);
+            --primary: #0B7551;
+            --dark: #142335;
+            --white: #FFFFFF;
+            --bg: #F6FAF8;
+            --soft-green: rgba(11, 117, 81, 0.08);
+            --soft-green-strong: rgba(11, 117, 81, 0.14);
+            --border: rgba(20, 35, 53, 0.10);
+            --text-muted: rgba(20, 35, 53, 0.68);
+            --shadow: 0 18px 40px rgba(20, 35, 53, 0.08);
         }
 
-        html, body, [data-testid="stAppViewContainer"] {
-                background: radial-gradient(circle at 92% 0%, rgba(196,154,82,.11), transparent 28rem), var(--monos-bg);
-            color: var(--monos-text);
-                font-family: 'DM Sans', sans-serif;
+        html, body, [data-testid="stAppViewContainer"], .stApp {
+            background: var(--white);
+            color: var(--dark);
+            font-family: 'DM Sans', sans-serif;
         }
 
         .stApp {
-                background: radial-gradient(circle at 92% 0%, rgba(196,154,82,.11), transparent 28rem), var(--monos-bg);
+            background: linear-gradient(180deg, #FFFFFF 0%, #F6FAF8 100%);
+        }
+
+        .block-container {
+            padding-top: 1.5rem;
+            padding-bottom: 3rem;
+            max-width: 1280px;
+        }
+
+        div[data-testid="stVerticalBlock"] > div {
+            gap: 0.9rem;
         }
 
         [data-testid="stSidebar"] {
-                background: #eeeae1;
-            border-right: 1px solid var(--monos-border);
+            background: var(--primary);
+            border-right: 0;
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.12);
+        }
+
+        [data-testid="stSidebar"] * {
+            color: var(--white) !important;
         }
 
         [data-testid="stSidebarNav"] {
             padding-top: 1rem;
         }
 
-        .block-container {
-                padding-top: 2.2rem;
-            padding-bottom: 3rem;
-            max-width: 1280px;
+        [data-testid="stSidebarNav"] a,
+        [data-testid="stSidebarNav"] button,
+        [data-testid="stSidebar"] .stSelectbox > div > div {
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        [data-testid="stSidebarNav"] a {
+            padding: 0.8rem 0.9rem;
+            margin: 0.1rem 0;
+            border: 1px solid transparent;
+            background: transparent;
+        }
+
+        [data-testid="stSidebarNav"] a:hover {
+            background: rgba(255,255,255,0.10);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        [data-testid="stSidebarNav"] a[aria-current="page"] {
+            background: rgba(255,255,255,0.14);
+            border-color: rgba(255,255,255,0.16);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+
+        [data-testid="stSidebar"] h1,
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] label {
+            color: var(--white) !important;
         }
 
         .stButton > button,
         .stDownloadButton > button,
-        .stFormSubmitButton > button {
-                background: var(--monos-primary);
-            color: #fff;
-            border: 0;
-                border-radius: 10px;
-            padding: 0.65rem 1rem;
-            font-weight: 600;
-                box-shadow: 0 8px 18px rgba(23, 59, 53, 0.15);
+        .stFormSubmitButton > button,
+        .stLinkButton > a,
+        button[kind="primary"] {
+            background: var(--primary);
+            color: var(--white);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 0.72rem 1rem;
+            font-weight: 700;
+            box-shadow: none;
+            transition: all 0.2s ease;
         }
 
         .stButton > button:hover,
         .stDownloadButton > button:hover,
-        .stFormSubmitButton > button:hover {
-                background: var(--monos-primary-soft);
-            color: #fff;
+        .stFormSubmitButton > button:hover,
+        .stLinkButton > a:hover,
+        button[kind="primary"]:hover {
+            background: #0A644A;
+            border-color: #0A644A;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(11, 117, 81, 0.18);
+        }
+
+        .stButton > button:focus,
+        .stDownloadButton > button:focus,
+        .stFormSubmitButton > button:focus,
+        .stLinkButton > a:focus {
+            box-shadow: 0 0 0 4px rgba(11, 117, 81, 0.14);
+        }
+
+        .stSecondaryButton > button,
+        .stLinkButton > a {
+            background: var(--white);
+            color: var(--primary);
+            border: 1px solid rgba(11, 117, 81, 0.32);
+        }
+
+        .stSecondaryButton > button:hover,
+        .stLinkButton > a:hover {
+            background: rgba(11, 117, 81, 0.04);
+            border-color: rgba(11, 117, 81, 0.32);
         }
 
         .stTextInput > div > div > input,
         .stNumberInput input,
         .stSelectbox > div > div,
         .stDateInput > div > div,
-        .stTextArea textarea {
-                background: var(--monos-card);
-            border: 1px solid var(--monos-border);
+        .stTextArea textarea,
+        .stChatInput textarea,
+        [data-baseweb="select"] > div,
+        [data-testid="stBaseButton-secondary"] {
+            background: var(--white);
+            border: 1px solid rgba(20, 35, 53, 0.15);
             border-radius: 12px;
-            color: var(--monos-text);
+            color: var(--dark);
+            box-shadow: none;
+        }
+
+        .stTextInput > div > div > input,
+        .stNumberInput input,
+        .stTextArea textarea,
+        .stChatInput textarea {
+            padding: 0.8rem 0.9rem;
+        }
+
+        .stTextInput > div > div > input:focus,
+        .stNumberInput input:focus,
+        .stTextArea textarea:focus,
+        .stSelectbox > div > div:focus,
+        .stDateInput > div > div:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(11, 117, 81, 0.12);
+        }
+
+        .stTextInput > label,
+        .stNumberInput > label,
+        .stSelectbox > label,
+        .stDateInput > label,
+        .stTextArea > label,
+        [data-testid="stMetricLabel"],
+        label,
+        .stCaption {
+            color: var(--text-muted) !important;
+            font-weight: 600;
         }
 
         .stMetric {
-                background: var(--monos-card);
-            border: 1px solid var(--monos-border);
-            border-radius: 16px;
-            padding: 1rem;
-                box-shadow: var(--monos-shadow);
+            background: rgba(255,255,255,0.96);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 1rem 1.1rem;
+            box-shadow: var(--shadow);
         }
 
         .stMetric [data-testid="metric-container"] {
@@ -113,125 +212,210 @@ st.markdown(
         }
 
         .stMetric [data-testid="stMetricValue"] {
-            color: var(--monos-primary-soft);
-            font-weight: 700;
-        }
-
-        div[data-testid="stVerticalBlock"] > div {
-            gap: 0.8rem;
+            color: var(--dark);
+            font-weight: 800;
+            font-size: 1.65rem;
+            letter-spacing: -0.03em;
         }
 
         h1, h2, h3, h4 {
-            color: var(--monos-primary);
+            color: var(--dark);
             font-family: 'Manrope', sans-serif;
-            letter-spacing: 0;
+            letter-spacing: -0.03em;
+            margin-top: 0;
         }
 
         h1 {
-            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.4rem;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 2.4vw, 2rem);
             font-weight: 800;
         }
 
-        [data-testid="stSidebar"] h1 {
-            font-size: 1.6rem;
-            letter-spacing: 0.02em;
-        }
-
-        label, [data-testid="stMetricLabel"] {
-            color: var(--monos-muted) !important;
-            font-weight: 600;
-        }
-
-        .stDownloadButton > button, .stLinkButton > a {
-            border: 1px solid var(--monos-accent);
-        }
-
-        .stLinkButton > a {
-            background: var(--monos-accent-soft);
-            color: var(--monos-primary);
-            border-radius: 10px;
+        h3 {
+            font-size: 1.2rem;
             font-weight: 700;
         }
 
+        .stTabs [role="tablist"] {
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .stTabs [role="tab"] {
+            border-radius: 12px 12px 0 0;
+            padding: 0.65rem 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .stTabs [role="tab"][aria-selected="true"] {
+            background: rgba(11, 117, 81, 0.08);
+            color: var(--primary);
+            border-color: rgba(11, 117, 81, 0.14);
+        }
+
+        .stDataFrame, .stTable, .stExpander {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .stDataFrame > div {
+            border-radius: 16px;
+        }
+
+        .stDataFrame th {
+            background: var(--dark);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .stDataFrame td {
+            background: var(--white);
+            color: var(--dark);
+        }
+
+        .stDataFrame tbody tr:hover {
+            background: rgba(11, 117, 81, 0.03);
+        }
+
+        .stAlert, .stWarning, .stSuccess, .stError {
+            border-radius: 14px;
+            border: 1px solid transparent;
+            box-shadow: none;
+        }
+
+        .stSuccess {
+            background: rgba(11, 117, 81, 0.08);
+            border-color: rgba(11, 117, 81, 0.16);
+            color: var(--primary);
+        }
+
+        .stWarning {
+            background: rgba(20, 35, 53, 0.04);
+            border-color: rgba(20, 35, 53, 0.10);
+            color: var(--dark);
+        }
+
+        .stError {
+            border-color: rgba(220, 53, 69, 0.18);
+            background: rgba(220, 53, 69, 0.05);
+            color: #9b1c1c;
+        }
+
         .monos-header {
-                background: rgba(255,253,250,0.82);
-            border: 1px solid var(--monos-border);
-                border-radius: 12px;
-            padding: 0.9rem 1.1rem;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 0.95rem 1.2rem;
             margin-bottom: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-                box-shadow: var(--monos-shadow);
+            box-shadow: var(--shadow);
         }
 
         .monos-brand {
             display: flex;
             align-items: center;
-            gap: 0.9rem;
+            gap: 0.85rem;
         }
 
         .monos-logo {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-                background: var(--monos-primary);
-                color: #f5dfae;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: var(--white);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
+            box-shadow: 0 12px 24px rgba(11, 117, 81, 0.22);
         }
 
         .monos-brand-text {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--monos-primary);
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.02em;
         }
 
         .monos-link {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.65rem 1rem;
+            padding: 0.7rem 1rem;
             border-radius: 999px;
-                background: var(--monos-accent-soft);
-            border: 1px solid var(--monos-border);
-            color: var(--monos-primary);
+            background: var(--white);
+            border: 1px solid rgba(20, 35, 53, 0.10);
+            color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            transition: all 0.2s ease;
         }
 
         .monos-link:hover {
-                background: #ead8b4;
+            background: rgba(11, 117, 81, 0.06);
+            border-color: rgba(11, 117, 81, 0.18);
             text-decoration: none;
+            transform: translateY(-1px);
         }
 
         .monos-card {
-            background: var(--monos-card);
-            border: 1px solid var(--monos-border);
-            border-radius: 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 18px;
             padding: 1.2rem;
-                box-shadow: var(--monos-shadow);
+            box-shadow: var(--shadow);
         }
 
         .monos-subtle {
-            color: var(--monos-muted);
+            color: var(--text-muted);
             font-size: 0.95rem;
         }
 
         .monos-badge {
             display: inline-block;
-            background: var(--monos-accent-soft);
-            color: var(--monos-primary);
+            background: rgba(11, 117, 81, 0.10);
+            color: var(--primary);
             border-radius: 999px;
-            padding: 0.3rem 0.7rem;
-            font-size: 0.73rem;
-            font-weight: 700;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.72rem;
+            font-weight: 800;
             letter-spacing: 0.04em;
             text-transform: uppercase;
+        }
+
+        [data-testid="stPopover"] > div {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(20,35,53,0.12);
+        }
+
+        [data-testid="stPopover"] [data-testid="baseButton-secondary"] {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        [data-testid="stChatMessage"] {
+            border-radius: 16px;
+        }
+
+        [data-testid="stChatMessage"] > div {
+            border-radius: 14px;
         }
     </style>
     """,
